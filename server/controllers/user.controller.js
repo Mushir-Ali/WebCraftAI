@@ -13,6 +13,5 @@ export const getCurrentUser = async(req,res)=>{
             success:false,
             message:`Get current user failed ${err.message}`
         })
-
     }
 }

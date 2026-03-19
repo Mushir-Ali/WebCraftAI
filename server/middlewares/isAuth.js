@@ -10,8 +10,8 @@ const isAuth = async(req,res,next) => {
                 message:"Please login to access this resource"
             })
         }
-        const decoded = await jwt.verify(token,process.env.JWT_SECRET);
-        req.user = await User.findById(decoded._id);
+        const decoded = jwt.verify(token,process.env.JWT_SECRET);
+        req.user = await User.findById(decoded.id);
         next();
     }
     catch(err){

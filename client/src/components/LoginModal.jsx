@@ -15,7 +15,7 @@ function LoginModal({open, onClose}) {
             email: result.user.email,
             avatar: result.user.photoURL
         },{withCredentials: true})
-        console.log(data)
+        // console.log(data)
     }
     catch(error){
         console.log(error);
