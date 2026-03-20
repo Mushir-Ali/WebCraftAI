@@ -1,12 +1,11 @@
 const openRouterUrl = "https://openrouter.ai/api/v1/chat/completions"
 const model = "deepseek/deepseek-chat"
-const openRouterApiKey = process.env.OPENROUTER_API_KEY
 
-const generateResponse = async (prompt)=>{
+export const generateResponse = async (prompt)=>{
     const res = await fetch(openRouterUrl, {
         method: 'POST',
         headers: {
-            Authorization: `Bearer ${openRouterApiKey}`,
+            Authorization: `Bearer ${process.env.OPENROUTER_API_KEY}`,
             'Content-Type': 'application/json',
         },
         body: JSON.stringify({
@@ -33,5 +32,4 @@ const generateResponse = async (prompt)=>{
 
     const data = await res.json()
     return data.choices[0].message.content
-
 }
