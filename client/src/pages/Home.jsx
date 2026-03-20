@@ -6,6 +6,7 @@ import { Coins } from 'lucide-react'
 import { serverUrl } from '../App'
 import { setUserData } from '../redux/userSlice'
 import axios from 'axios'
+import { useNavigate } from 'react-router-dom'
 function Home() {
 
     const highlights = [
@@ -19,11 +20,14 @@ function Home() {
     const {userData} = useSelector((state)=>state.user)
     const [openProfile, setOpenProfile] = useState(false)
     const dispatch = useDispatch()
+    const navigate = useNavigate()
+
     const handleLogOut = async ()=>{
       try{
         await axios.get(`${serverUrl}/api/auth/logout`, {withCredentials: true})
         dispatch(setUserData(null))
         setOpenProfile(false)
+        navigate('/')
       }
       catch(error){
         console.log(error);
@@ -80,7 +84,7 @@ function Home() {
                         <span className='font-semibold'>+</span>
                       </button>
 
-                      <button className='w-full px-4 py-3 text-left text-sm hover:bg-white/5'>Dashboard</button>
+                      <button className='w-full px-4 py-3 text-left text-sm hover:bg-white/5' onClick={() => navigate('/dashboard')}>Dashboard</button>
                       <button className='w-full px-4 py-3 text-left text-sm text-red-400 hover:bg-white/5' onClick={handleLogOut}>Logout</button>
                     </motion.div>
                   </>
@@ -112,7 +116,9 @@ function Home() {
         </motion.p>
 
         <button className='mt-12 px-10 py-4 rounded-xl bg-white text-black font-semibold hover:scale-105 transition'
-        >Get Started</button>
+        onClick={()=>navigate('/dashboard')}>
+          {userData ? "Go to Dashboard" : "Get Started"}
+        </button>
 
       </section>
 
