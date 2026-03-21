@@ -159,7 +159,6 @@ export const generateWebsite = async(req,res)=>{
             return res.status(400).json({message: "Prompt is required"})
         }
         const user = await User.findById(req.user._id);
-        console.log(user);
         if(!user){
             return res.status(401).json({message: "User is not authorized"})
         }
@@ -187,7 +186,7 @@ export const generateWebsite = async(req,res)=>{
                 raw
             });
         }
-        console.log(parsed);
+
         const website = await Website.create({
             user: user._id,
             title: prompt.slice(0,50),
@@ -231,3 +230,93 @@ export const getWebsiteById = async(req,res)=>{
     }
 }
 
+
+export const changes = async(req,res)=>{
+    try{
+        const {prompt} = req.body;
+        if(!prompt){
+            return res.status(400).json({message: "Prompt is required"})
+        }
+
+        const website = await Website.findOne({
+            _id: req.params.id,
+            user: req.user._id
+        })
+
+        if(!website){
+            return res.status(400).json({message: "Website not found"});
+        }
+
+        const user = await User.findById(req.user._id);
+        if(!user){
+            return res.status(401).json({message: "User is not authorized"})
+        }
+
+        if(user.credits<25){
+            return res.status(403).json({message: "Not enough credits. Each website generation costs 50 credits."})
+        }
+        
+        const updatePrompt = `
+            UPDATE THIS HTML WEBSITE.
+
+            CURRENT CODE:
+            ${website.latestCode}
+
+            USER REQUEST:
+            ${prompt}
+
+            RETURN RAW JSON ONLY:
+            {
+            "message": "Short confirmation",
+            "code": "<UPDATED FULL HTML>"
+            }
+        `;
+
+        let raw = "";
+        let parsed = null;
+        for(let i = 0; i < 2 && !parsed; i++){
+            raw = await generateResponse(updatePrompt);
+            parsed = await extractJson(raw);
+            if(!parsed){
+                raw = await generateResponse(updatePrompt + "\n\n RETURN ONLY RAW JSON");
+                parsed = await extractJson(raw);
+            }
+        }
+
+        if (!parsed || !parsed.code) {
+            console.log("AI FAILED RESPONSE:\n", raw);
+            return res.status(500).json({
+                message: "AI did not return valid JSON",
+                raw
+            });
+        }
+
+        website.conversation.push(
+            {role:"user",content:prompt},
+            {role:"ai",content:parsed.message}
+        )
+
+        website.latestCode = parsed.code
+        await website.save();
+        user.credits = user.credits-25;
+        await user.save();
+
+        return res.status(201).json({message: parsed.message,code: parsed.code,remainingCredits: user.credits});
+
+    }
+    catch(err){
+        return res.status(500).json({message: `Changes error ${err.message}`})
+    }
+}
+
+export const getAll = async(req,res)=>{
+    try{
+        const website = await Website.find({
+            user: req.user._id
+        })
+        return res.status(200).json(website);
+    }
+    catch(err){
+        return res.status(500).json({message: `Get all websites error ${err.message}`})
+    }
+}
