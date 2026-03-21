@@ -12,19 +12,47 @@ function Editor() {
     const [messages,setMessages] = useState([])
     const [prompt,setPrompt] = useState("")
     const iframeRef = useRef(null)
+    const [updateLoading,setUpdateLoading] = useState(false)
+    const [thinkingIndex,setThinkingIndex] = useState(0)
+
+    const thinkingSteps = [
+        "Understanding your request...",
+        "Planning the layout changes...",
+        "Improving responsiveness...",
+        "Applying animations...",
+        "Finalizing updates...",
+    ]
+
     const handleUpdate = async()=>{
+        if(!prompt){
+            return;
+        }
+        setUpdateLoading(true)
+        const text = prompt;
+        setPrompt("");
         setMessages((m)=>[...m,{role:"user",content:prompt}])
         try{
-            const result = await axios.post(`${serverUrl}/api/website/update/${id}`,{prompt},{withCredentials: true})
-            console.log("i am here")
+            const result = await axios.post(`${serverUrl}/api/website/update/${id}`,{prompt:text},{withCredentials: true})
+            // console.log("i am here")
             console.log(result);
+            setUpdateLoading(false)
             setMessages((m)=>[...m,{role:"ai",content:result.data.message}])
             setCode(result.data.code)
         }
         catch(err){
+            setUpdateLoading(false)
             console.log(err);
         }
     }
+
+    useEffect(()=>{
+        if(!updateLoading) return;
+        const i = setInterval(()=>{
+            setThinkingIndex((i)=>(i+1)%thinkingSteps.length)
+        },1200)
+
+        return ()=>clearInterval(i)
+    },[updateLoading])
 
     useEffect(()=>{
         const handleGetWebsite = async()=>{
@@ -74,11 +102,21 @@ function Editor() {
                     </div>
                 </div>
               ))}
+
+
+              {updateLoading && (
+                <div className='max-w-[85%] mr-auto'>
+                    <div className='px-4 py-2.5 rounded-2xl text-xs bg-white/5 border border-white/10 text-zinc-400 italic'>
+                        {thinkingSteps[thinkingIndex]}
+                    </div>
+                </div>
+              )}
+
             </div>
             <div className='p-3 border-t border-white/10'>
                 <div className='flex gap-2'>
                     <textarea row="1" placeholder='Describe changes...' className='flex-1 resize-none rounded-2xl px-4 py-3 bg-white/5 border border-white/10 text-sm outline-none' onChange={(e)=>setPrompt(e.target.value)} value={prompt}></textarea>
-                    <button className='px-4 py-3 rounded-2xl bg-white text-black' onClick={handleUpdate}><Send size={14}/></button>
+                    <button className='px-4 py-3 rounded-2xl bg-white text-black' disabled={updateLoading} onClick={handleUpdate}><Send size={14}/></button>
                 </div>
             </div>
 
