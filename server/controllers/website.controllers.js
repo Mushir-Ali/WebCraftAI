@@ -212,3 +212,22 @@ export const generateWebsite = async(req,res)=>{
         return res.status(500).json({message: `Website generation error ${err.message}`})
     }
 }
+
+
+export const getWebsiteById = async(req,res)=>{
+    try{
+        // console.log("i am here")
+        const website = await Website.findOne({
+            _id: req.params.id,
+            user: req.user._id
+        })
+        if(!website){
+            return res.status(400).json({message: "Website not found"})
+        }
+        return res.status(200).json(website);
+    }
+    catch(err){
+        return res.status(500).json({message: `get website by ID error : ${err}`});
+    }
+}
+

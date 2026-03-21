@@ -14,7 +14,7 @@ function useGetCurrentUser() {
                     withCredentials: true
                 })
                 dispatch(setUserData(response.data))
-                console.log(response);
+                // console.log(response);
                 // console.log("Main chal raha hoon")
             } catch (error) {
                 console.error('Error fetching current user:', error.response?.data || error.message)
