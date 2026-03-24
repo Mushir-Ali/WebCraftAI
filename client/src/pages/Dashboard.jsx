@@ -13,6 +13,16 @@ function Dashboard() {
     const [loading, setLoading] = useState(false)
     const [error,setError] = useState("")
 
+    const handleDeploy = async(id)=>{
+        try{
+            const result = await axios.get(`${serverUrl}/api/website/deploy/${id}`,{withCredentials: true})
+            window.open(`${result.data.url}`,"_blank")
+        }
+        catch(err){
+            console.log(err);
+        }
+    }
+
     useEffect(()=>{
         const handleGetAllWebsites = async()=>{
             try{
@@ -91,7 +101,8 @@ function Dashboard() {
                                 <p>Last updated {""} {new Date(w.updatedAt).toLocaleString()}</p>
 
                                 {!w.deployed ? (
-                                    <button className='mt-auto flex items-center justify-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold bg-gradient-to-r from-indigo-500 to-purple-500 hover:scale-105 transition'><Rocket size={18}/>Deploy</button>
+                                    <button className='mt-auto flex items-center justify-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold bg-gradient-to-r from-indigo-500 to-purple-500 hover:scale-105 transition' onClick={(e) => {e.stopPropagation();
+                                        handleDeploy(w._id)}}><Rocket size={18}/>Deploy</button>
                                 ) : (
                                     <button><Share2/>Share link</button>
                                 )}
