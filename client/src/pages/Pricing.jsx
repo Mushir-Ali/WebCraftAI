@@ -81,7 +81,7 @@ function Pricing() {
                         whileInView={{ opacity: 1, y: 0 }}
                         transition={{ delay: i * 0.12 }}
                         whileHover={{ y: -14, scale: 1.03 }}
-                        className={`relative rounded-3xl p-8 border backdrop-blur-xl transition-all ${plans.popular ? "border-indigo-500 bg-gradient-to-b from-indigo-500/20 to-transparent shadow-2xl shadow-indigo-500/30" : "border-white/10 bg-white/5 hover:border-indigo-400 hover:bg-white/10"}`}
+                        className={`relative rounded-3xl p-8 border backdrop-blur-xl transition-all ${p.popular ? "border-indigo-500 bg-gradient-to-b from-indigo-500/20 to-transparent shadow-2xl shadow-indigo-500/30" : "border-white/10 bg-white/5 hover:border-indigo-400 hover:bg-white/10"}`}
                     >
                         {p.popular && (
                             <span className='absolute top-5 right-5 px-3 py-1 text-xs rounded-full bg-indigo-500'>Most Popular</span>)}
