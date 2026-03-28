@@ -8,7 +8,7 @@ import { useSelector } from 'react-redux';
 import WebsiteEditor from './pages/Editor';
 import LiveSite from './pages/LiveSite';
 import Pricing from './pages/Pricing';
-export const serverUrl = "https://webcraftai-z05i.onrender.com/";
+export const serverUrl = "https://webcraftai-z05i.onrender.com";
 function App() {
   useGetCurrentUser()
   const {userData} = useSelector((state) => state.user)
