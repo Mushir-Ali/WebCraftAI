@@ -36,6 +36,19 @@ function Home() {
     }
   }
 
+  // Refetch user data when returning from payment
+  useEffect(() => {
+    const refetchUser = async () => {
+      try {
+        const response = await axios.get(`${serverUrl}/api/user/me`, { withCredentials: true })
+        dispatch(setUserData(response.data))
+      } catch (error) {
+        console.error('Error refetching user:', error)
+      }
+    }
+    refetchUser()
+  }, [dispatch])
+
   useEffect(() => {
     if (!userData) {
       return;

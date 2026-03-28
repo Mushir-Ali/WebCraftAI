@@ -2,6 +2,11 @@ import { ArrowLeft, Check, Coins } from 'lucide-react';
 import React from 'react'
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'motion/react'
+import { useSelector } from 'react-redux';
+import axios from 'axios';
+import { serverUrl } from '../App';
+import { useState } from 'react';
+// import { set } from 'mongoose';
 const plans = [
     {
         key: 'free',
@@ -51,6 +56,28 @@ const plans = [
 
 function Pricing() {
     const navigate = useNavigate()
+    const {userData} = useSelector((state) => state.user)
+    const [loading, setLoading] = useState(null)
+
+    const handleBuy = async(planKey)=>{
+        if(!userData){
+            navigate("/")
+            return;
+        }
+        if(planKey === "free"){
+            navigate("/dashboard")
+            return
+        }
+        setLoading(planKey)
+        try{
+            const result = await axios.post(`${serverUrl}/api/billing`,{planType:planKey},{withCredentials: true});
+            window.location.href = result.data.checkoutUrl
+        }
+        catch(err){
+            console.log(err);
+            setLoading(null)
+        }
+    }
 
     return (
         <div className='relative min-h-screen overflow-hidden bg-[#050505] text-white px-6 pt-16 pb-24'>
@@ -112,13 +139,15 @@ function Pricing() {
 
                         <motion.button
                         whileTap={{scale:0.96}}
+                        disabled={loading}
+                        onClick={()=>handleBuy(p.key)}
                         className={`w-full py-3 rounded-xl font-semibold transition ${
                             p.popular
                             ? "bg-indigo-500 hover:bg-indigo-600"
                             : "bg-white/10 hover:bg-white/20" } disabled:opacity-60
                         `}
                         >
-                            {p.button}
+                            {loading===p.key ? "Redirecting..." : p.button}
                         </motion.button>
                     </motion.div>
                 ))}
