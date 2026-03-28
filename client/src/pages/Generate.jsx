@@ -45,24 +45,36 @@ function Generate() {
             setPhaseIndex(0)
             return;
         }
+
         let value = 0
-        let phase = 0
+
         const interval = setInterval(()=>{
-            const increment = value<20?Math.random*1.5:value<60?Math.random*1.2:Math.random*0.6;
-            value+=increment
-            if(value>=93){
+            const increment =
+                value < 20
+                    ? Math.random() * 1.5
+                    : value < 60
+                    ? Math.random() * 1.2
+                    : Math.random() * 0.6;
+
+            value += increment
+
+            if(value >= 93){
                 value = 93
             }
-            phase = Math.min(Math.floor((value/100)*PHASES.length),PHASES.length-1)
-            // if(phase>PHASES.length-1){
-            //     clearInterval(interval)
-            //     return;
-            // }
-            setPhaseIndex(Math.floor(phase))
+
+            const phase = Math.min(
+                Math.floor((value / 100) * PHASES.length),
+                PHASES.length - 1
+            )
+
+            setPhaseIndex(phase)
             setProgress(value)
+
         },1200)
+
         return ()=>clearInterval(interval)
-    },[])
+
+    },[loading])
 
   return (
     <div className='min-h-screen bg-gradient-to-br from-[#050505] via-[#0b0b0b] to-[#050505] text-white'>
@@ -120,7 +132,7 @@ function Generate() {
                 >
                     <div className='flex justify-between mb-2 text-xs text-zinc-400'>
                         <span>{PHASES[phaseindex]}</span>
-                        <span>{progress}%</span>
+                        <span>{Math.floor(progress)}%</span>
                     </div>
 
                     <div className='h-2 w-full bg-white/20 rounded-full overflow-hidden'>
